@@ -1,6 +1,6 @@
 # AutoDeploy
-an auto deploy tool  ×Ô¶¯²¿Êð¹¤¾ß
+an auto deploy tool  è‡ªåŠ¨éƒ¨ç½²å·¥å…·
 
-ÈÎÒâÌí¼Ó±¾µØÃüÁî
-ÈÎÒâÌí¼ÓÔ¶³ÌÃüÁî
-ÈÎÒâÉÏ´«ÎÄ¼þ»òÄ¿Â¼
+ä»»æ„æ·»åŠ æœ¬åœ°å‘½ä»¤
+ä»»æ„æ·»åŠ è¿œç¨‹å‘½ä»¤
+ä»»æ„ä¸Šä¼ æ–‡ä»¶æˆ–ç›®å½•
