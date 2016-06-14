@@ -9,8 +9,8 @@ import (
 	"log"
 	"os"
 	"strconv"
-
 	"io"
+	"time"
 )
 
 /**
@@ -58,13 +58,14 @@ func ExecuteShell(client *ssh.Client, shell string) {
 	// the remote side using the Run method.
 	var b bytes.Buffer
 	session.Stdout = &b
+
 	if err := session.Run(shell); err != nil {
 		panic("Failed to run: " + err.Error())
 	}
 	fmt.Println(b.String())
 }
 
-func ExecuteShellGo(client *ssh.Client, shell string) {
+func ExecuteShellGo(client *ssh.Client, shell string){
 	if shell == "" {
 		log.Println("shell is nil")
 		return
@@ -78,21 +79,25 @@ func ExecuteShellGo(client *ssh.Client, shell string) {
 	// the remote side using the Run method.
 	//var b bytes.Buffer
 	//session.Stdout = &b
-	go session.Start(shell)
+
 	out, err := session.StdoutPipe()
 	if err != nil {
 		log.Fatal("estart shell err:", err)
 	}
 	read := bufio.NewReader(out)
-
+	session.Setenv("LANG","zh_CN.UTF-8")
+	session.Start(shell)
+	start := time.Now().Second()
 	for {
 		line, err := read.ReadString('\n')
 		if err != nil || io.EOF == err {
 			break
 		}
-		fmt.Print(line)
+		log.Print(line)
+		if (time.Now().Second() - start) >= 10 {
+			break
+		}
 	}
-	session.Wait()
 
 }
 
@@ -118,6 +123,7 @@ func UploadFile(sftp *sftp.Client, localFile, remotePath string) {
 	defer inputFile.Close()
 
 	f, err := sftp.Create(remotePath)
+
 	if err != nil {
 		log.Fatal("sftp.Create.err", err)
 	}
@@ -129,8 +135,11 @@ func UploadFile(sftp *sftp.Client, localFile, remotePath string) {
 	fileReader := bufio.NewReader(inputFile)
 	counter := 0
 	for {
-		buf := make([]byte, 10240)
-		n, _ := fileReader.Read(buf)
+		buf := make([]byte, 20480)
+		n, err := fileReader.Read(buf)
+		if err == io.EOF{
+			break
+		}
 		counter++
 		//fmt.Printf("%d,%s", n, string(buf))
 		if n == 0 {

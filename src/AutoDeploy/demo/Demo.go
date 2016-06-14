@@ -120,7 +120,7 @@ type a string
 
 func testStruts() {
 	var p persion
-	p.name = "jiashiran"
+	p.name = "jj"
 	p.age = 10
 	p.setName("asfa")
 	fmt.Println(p)

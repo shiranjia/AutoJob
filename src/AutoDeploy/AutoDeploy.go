@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	_ "io"
 	_ "io/ioutil"
@@ -10,44 +9,238 @@ import (
 	"os"
 	"os/exec"
 	"AutoDeploy/commons"
-
-	"AutoDeploy/db"
+	"golang.org/x/crypto/ssh"
+	_ "html/template"
+	"encoding/json"
+	"bufio"
+	"io"
 )
 
-const A = "a"
-const B = "asd"
-const (
-	i = iota
-	j
-	h
-)
 
 func main() {
 	fmt.Println("gopath=", os.Getenv("gopath"))
 	//demo.Route()
 	//web.Service()
-	//build()
-	db.Insert()
+	build()
+	//a := "org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [\"ajp-nio-8009\"]"
+	//fmt.Println(strings.Contains(a,"startup in"))
+	//db.Insert()
 }
 
 func build() {
-	config := &commons.SSHConfig{"root", "1qaz@WSX", "192.168.104.141", 22}
-	client, err := commons.GetSSHClient(config)
+	sshConfig := &commons.SSHConfig{"root", "1qaz@WSX", "192.168.104.141", 22}
+
+	var h5_ticket_com  DeployJob;
+	h5_ticket_com.config = sshConfig
+	h5_ticket_com.name = "h5_ticket_com"
+	h5_ticket_com.remoteBefore = append(h5_ticket_com.remoteBefore,&remoteComm{false,"rm -rf /export/App/h5.ticket.jd.com"})
+	h5_ticket_com.localBefore = append(h5_ticket_com.localBefore,&localComm{false,"E:\\github\\ticket.h5\\web","mvn",
+		[]string{"clean","package","-Dmaven.test.skip=true","-P","artifactory,development","-Dfile.encoding=UTF-8"}})
+	h5_ticket_com.uploadJob = &uploadJob{"E:/github/ticket.h5/web/target/ticket-h5-web","/home"}
+	h5_ticket_com.remoteAfter = append(h5_ticket_com.remoteAfter , &remoteComm{false,"mv /home/ticket-h5-web /export/App/h5.ticket.jd.com/"})
+	h5_ticket_com.remoteAfter = append(h5_ticket_com.remoteAfter , &remoteComm{true,"sh /export/Shell/h5.ticket.jd.com/restart"})
+	//h5_ticket_com.deploy()
+
+	var piao_jd_web  DeployJob;
+	piao_jd_web.config = sshConfig
+	piao_jd_web.name = "piao_jd_web"
+	piao_jd_web.remoteBefore = append(piao_jd_web.remoteBefore,&remoteComm{false,"rm -rf /export/App/piao.jd.com"})
+	piao_jd_web.localBefore = append(piao_jd_web.localBefore,&localComm{false,"E:\\git_source\\piao-web\\jd-ticket-web","mvn",
+		[]string{"clean","package","-Dmaven.test.skip=true","-P","artifactory,development"}})
+	piao_jd_web.uploadJob = &uploadJob{"E:/git_source/piao-web/jd-ticket-web/target/jd-ticket-web","/home"}
+	piao_jd_web.remoteAfter = append(piao_jd_web.remoteAfter , &remoteComm{false,"mv /home/jd-ticket-web  /export/App/piao.jd.com/"})
+	piao_jd_web.remoteAfter = append(piao_jd_web.remoteAfter , &remoteComm{true,"sh /export/Shell/piao.jd.com/tomcat"})
+	//piao_jd_web.deploy()
+
+	job := make([]DeployJob,0)
+	job = append(job,h5_ticket_com)
+	job = append(job,piao_jd_web)
+	save(job)
+	jobs := read("data")
+	for _,v := range jobs {
+		log.Println(v)
+	}
+
+}
+func checkErr(e error)  {
+	if e != nil{
+		panic(e)
+	}
+}
+
+func save(job []DeployJob)  {
+	file,err := os.Open("data")
+	if os.IsNotExist(err){
+		file,err = os.Create("data")
+	}
+	if err != nil {
+		log.Println("save job err",err)
+	}
+	defer file.Close()
+	for _,v := range job {
+		if v.config.Password != ""{
+			file.Write(v.byte())
+			file.Write([]byte("\n"))
+		}
+
+	}
+}
+
+func read(datafile string) []DeployJob  {
+	deploy := make([]DeployJob,0)
+	file,err := os.Open(datafile)
+	if err != nil {
+		log.Println("save job err",err)
+	}
+	defer file.Close()
+	read := bufio.NewReader(file)
+	for{
+		line,err := read.ReadString('\n')
+		if err!=nil {
+			if err == io.EOF{
+				break
+			}
+		}
+		//fmt.Printf(line)
+		deploy = append(deploy,byteToDeploy([]byte(line)))
+	}
+	return deploy
+}
+
+type DeployJob  struct{
+	name string
+	config *commons.SSHConfig
+	localBefore []*localComm
+	remoteBefore []*remoteComm
+	uploadJob *uploadJob
+	localAfter []*localComm
+	remoteAfter []*remoteComm
+}
+
+func (d *DeployJob) byte() []byte{
+	data := make(map[string][]byte)
+	b ,_ := json.Marshal(d.config)
+	data["cf"] = b
+	b ,_ = json.Marshal(d.localBefore)
+	data["lb"] = b
+	b ,_ = json.Marshal(d.remoteBefore)
+	data["rb"] = b
+	b ,_ = json.Marshal(d.uploadJob)
+	data["up"] = b
+	b ,_ = json.Marshal(d.localAfter)
+	data["la"] = b
+	b ,_ = json.Marshal(d.remoteAfter)
+	data["ra"] = b
+	s,_ := json.Marshal(data)
+	return s;
+}
+
+func byteToDeploy(b []byte) DeployJob   {
+	var deployJob DeployJob
+	data := make(map[string][]byte)
+	_ = json.Unmarshal(b,&data)
+
+	d := data["cf"]
+	var config commons.SSHConfig
+	_ = json.Unmarshal(d,&config)
+	deployJob.config = &config
+
+	d = data["lb"]
+	var lb []*localComm
+	_ = json.Unmarshal(d,&lb)
+	deployJob.localBefore = lb
+
+	d = data["rb"]
+	var rb []*remoteComm
+	_ = json.Unmarshal(d,&rb)
+	deployJob.remoteBefore = rb
+
+	d = data["up"]
+	var up uploadJob
+	_ = json.Unmarshal(d,&up)
+	deployJob.uploadJob = &up
+
+	d = data["la"]
+	var la []*localComm
+	_ = json.Unmarshal(d,&la)
+	deployJob.localAfter = la
+
+	d = data["ra"]
+	var ra []*remoteComm
+	_ = json.Unmarshal(d,&ra)
+	deployJob.remoteAfter = ra
+
+	return deployJob
+}
+
+func (deploy *DeployJob) deploy()  {
+	client, err := commons.GetSSHClient(deploy.config)//*ssh.Client
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Close()
-	arg := []string{"clean","package","-Dmaven.test.skip=true","-P","artifactory,development","-Dfile.encoding=UTF-8"}
-	cmd("E:\\github\\ticket.h5\\web","mvn",arg)
-	/*go commons.ExecuteShell(client,"rm -rf /export/App/h5.ticket.jd.com*/ /*");
-
-
-
-	commons.UploadPath(client,"E:/github/ticket.h5/web/target/ticket-h5-web","/home")
-	commons.ExecuteShell(client,"mv /home/ticket-h5-web*/ /* /export/App/h5.ticket.jd.com/");*/
-	//commons.ExecuteShellGo(client, "sh /export/Shell/h5.ticket.jd.com/restart")
+	for _,lb := range deploy.localBefore {
+		lb.run()
+	}
+	for _,rb := range deploy.remoteBefore {
+		rb.run(client)
+	}
+	uploadJob := deploy.uploadJob
+	if uploadJob != nil && deploy.uploadJob.LocalPath != ""{
+		deploy.uploadJob.run(client)
+	}
+	for _,la := range deploy.localAfter{
+		la.run()
+	}
+	for _,ra := range deploy.remoteAfter {
+		ra.run(client)
+	}
 }
 
+type localComm  struct{
+	IsGo bool
+	Path string
+	Command string
+	Args []string
+
+}
+
+func (job *localComm) run()  {
+	if job.IsGo{
+		go cmd(job.Path,job.Command,job.Args)
+	}else {
+		cmd(job.Path,job.Command,job.Args)
+	}
+}
+
+type remoteComm  struct{
+	IsGo bool
+	Command string
+}
+
+func (r *remoteComm) run(client *ssh.Client)  {
+	if r.IsGo{
+		commons.ExecuteShellGo(client,r.Command)
+	}else {
+		commons.ExecuteShell(client,r.Command)
+	}
+}
+
+type uploadJob  struct{
+	LocalPath string
+	RemotePath string //
+}
+
+func (u *uploadJob) run(client *ssh.Client)  {
+	if u.RemotePath == ""{
+		u.RemotePath = "/tmp"
+	}
+	commons.UploadPath(client,u.LocalPath,u.RemotePath)
+}
+
+/**
+本地命令
+ */
 func cmd(path, command string, arg []string) {
 	cmd := exec.Command(command)
 	cmd.Args = append(cmd.Args, arg...)
@@ -59,57 +252,4 @@ func cmd(path, command string, arg []string) {
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 	//log.Println(b.String())
-}
-
-func equals(a string) (bool, error) {
-	if a == "a" {
-		return true, nil
-	} else {
-		return false, errors.New("not equals")
-	}
-}
-
-func testSlice() {
-	fmt.Println(B)
-	fmt.Print(i)
-	fmt.Print(j)
-	fmt.Print(h)
-
-	arr := [20]int{1, 2}
-	reset(arr)
-	fmt.Println(arr)
-	a := []int{1, 2, 3}
-	fmt.Println(a)
-	b := make([]int, 3)
-	//reset(b)
-	b[1] = 12
-	fmt.Println(b)
-	b = arr[1:3]
-	_ = append(b, 25)
-	b[0] = 34
-	fmt.Println(arr)
-	copy(b, a)
-	fmt.Println(a)
-}
-
-func testMap() {
-	m := make(map[string]string)
-	m["a"] = "b"
-	m["b"] = "c"
-	for k, v := range m {
-		fmt.Println(k + " = " + v)
-	}
-	delete(m, "a")
-	fmt.Println(m)
-	a := make(map[int]int)
-	a[12] = 21
-	_ = a
-	fmt.Println(a)
-}
-
-func reset(sli [20]int) {
-	sli[0] = 12
-	for v := range sli {
-		defer fmt.Println("defer..", v)
-	}
 }

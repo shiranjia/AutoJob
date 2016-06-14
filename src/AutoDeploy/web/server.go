@@ -5,12 +5,12 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"html/template"
+	"github.com/pkg/errors"
 )
 
-const template = "<html> <body><h1><a href='/get'>get</a></br><a href='/post'>post</a></h1></body></html>"
-
 func Service() {
-	//http.HandleFunc("/",index)
+	http.HandleFunc("/index",index)
 	http.HandleFunc("/get", get)
 	http.HandleFunc("/post", post)
 	//dh := &defaultHandler{template}
@@ -23,11 +23,18 @@ func Service() {
 func index(res http.ResponseWriter, req *http.Request) {
 	fmt.Println(req.Header)
 	fmt.Println(req.Method)
-	html := "<html> <body>" +
-		"<a href='/get'>get</a>" +
-		"<a href='/post'>post</a>" +
-		"</body></html>"
-	io.WriteString(res, html)
+	//t := template.New("welcome")
+	t,err := template.ParseFiles("resources/views/welcome.tmpl")
+	if err != nil{
+		log.Fatal(err)
+	}
+	data :=  make(map[string]interface{})
+	data["a"] = "string aaa"
+	err = t.Execute(res,data)
+	template.Must(t,errors.New("template has error"))
+	if err != nil{
+		log.Fatal(err)
+	}
 }
 
 func get(res http.ResponseWriter, req *http.Request) {
