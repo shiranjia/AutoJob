@@ -1,0 +1,121 @@
+<html>
+<head><title>welcome</title></head>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+<script type="application/javascript">
+    function swich(name) {
+        $("[name=span_name]").attr("style","background-color: none;")
+        $("#name" + name).attr("style","background-color: brown;");
+        $("[name=deploy]").attr("style","display:none;")
+        $("#" + name).attr("style","display:block;")
+    }
+</script>
+<style>
+    .h_3{
+        float: left;
+    }
+    table{
+        border: 1px;
+    }
+</style>
+<body>
+{{range $index,$v := .}}
+   <h4 name="t_name" class="h_3" ><a style="border: ridge" href="#" onclick="swich({{$v.Name}})">
+       <span name="span_name" id="name{{$v.Name}}" {{if  eq $index 0 }} style="background-color: brown;" {{end}}>{{$v.Name}}</span></a>
+       &nbsp;
+   </h4>
+{{end}}
+
+</br></br></br></br></br>
+{{range $index,$v := .}}
+<div name="deploy"  id="{{.Name}}" {{if  gt $index 0 }} style="display:none;" {{end}}>
+ <form action="submit" method="post">
+     <div>
+         <table id="config">
+             <thead>SSH Config</thead>
+
+             <tbody>
+             <tr>
+                    <td><label>ssh.userName</label></td><td><input type="text" name="config.User" value="{{.Config.User}}" /></td>
+             </tr>
+             <tr>
+                 <td><label>ssh.password</label></td><td><input type="password" name="config.User" value="{{.Config.Password}}" /></td>
+             </tr>
+             <tr>
+                    <td><label>ssh.ip</label></td><td><input type="text" name="config.ip" value="{{.Config.Ip}}" /></td>
+             </tr>
+
+             {{range .LocalBefore}}
+             <tr>
+                 <td>Path:<input type="text" name="LocalBefore.Path" value="{{.Path}}" /></td>
+                 <td>Command:<input type="text" name="LocalBefore.Command" value="{{.Command}}" /></td>
+                 <td>Args:<input type="text" name="LocalBefore.Args" value="{{range .Args}} {{.}} {{end}}" /></td>
+             </tr>
+             {{end}}
+
+             <tr>
+                 <td><a href="#" id="AddMoreRemoteBefore" class="btn btn-info">点击添加远程命令:</a></span></p></td>
+                 <td>
+                     <div id="InputsRemoteBefore">
+                         {{range .RemoteBefore}}
+                         <div><input type="text" name="RemoteBefore.Command" id="RemoteBefore.Command_{{$index}}" value="{{.Command}}"/><a href="#" class="RemoteBeforeremoveclass">×</a></div>
+                         {{end}}
+                     </div>
+                 </td>
+             </tr>
+
+             <tr>
+                 <td><label>LocalPath</label></td><td><input type="text" name="UploadJob.LocalPath" value="{{.UploadJob.LocalPath}}" style="width: 500px"/></td>
+                 <td><label>RemotePath</label></td><td><input type="text" name="UploadJob.RemotePath" value="{{.UploadJob.RemotePath}}" style="width: 500px"/></td>
+             </tr>
+
+
+             {{range .LocalAfter}}
+             <tr>
+                 <td><label>Path</label></td><td><input type="text" name="LocalAfter.Path" value="{{.Path}}" /></td>
+                 <td><label>Command</label></td><td><input type="text" name="LocalAfter.Command" value="{{.Command}}" /></td>
+                 <td><label>Args</label></td><td><input type="text" name="LocalAfter.Args" value="{{range .Args}} {{.}} {{end}}" /></td>
+             </tr>
+             {{end}}
+
+             {{range .RemoteAfter}}
+             <tr>
+                 <td><label>Command</label></td><td><input type="text" name="RemoteAfter.Command" value="{{.Command}}" style="width: 500px"/></td>
+             </tr>
+             {{end}}
+             </tbody>
+         </table>
+     </div>
+     <button>save</button><button>deploy</button>
+ </form>
+</div>
+{{end}}
+
+<script>
+$(document).ready(function() {
+        var MaxInputs       = 8; //maximum input boxes allowed
+        var InputsWrapper   = $("#InputsRemoteBefore"); //Input boxes wrapper ID
+        var AddButton       = $("#AddMoreRemoteBefore"); //Add button ID
+        var x = InputsWrapper.length; //initlal text box count
+        var FieldCount=1; //to keep track of text box added
+        $(AddButton).click(function (e)  //on add input button click
+        {
+            if(x <= MaxInputs) //max input box allowed
+            {
+                FieldCount++; //text box added increment
+                //add input box
+                $(InputsWrapper).append('<div><input type="text" name="RemoteBefore.Command" id="RemoteBefore.Command_'+ FieldCount +'" /><a href="#" class="RemoteBeforeremoveclass">×</a></div>');
+                x++; //text box increment
+            }
+            return false;
+        });
+        $("body").on("click",".RemoteBeforeremoveclass", function(e){ //user click on remove text
+            if( x > 1 ) {
+                $(this).parent('div').remove(); //remove text box
+                x--; //decrement textbox
+            }
+            return false;
+        })
+});
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"html/template"
-	"github.com/pkg/errors"
+	"AutoDeploy/job"
 )
 
 func Service() {
@@ -21,17 +21,13 @@ func Service() {
 }
 
 func index(res http.ResponseWriter, req *http.Request) {
-	fmt.Println(req.Header)
-	fmt.Println(req.Method)
-	//t := template.New("welcome")
-	t,err := template.ParseFiles("resources/views/welcome.tmpl")
+	t,err := template.ParseFiles("resources/views/welcome.html")
 	if err != nil{
 		log.Fatal(err)
 	}
-	data :=  make(map[string]interface{})
-	data["a"] = "string aaa"
-	err = t.Execute(res,data)
-	template.Must(t,errors.New("template has error"))
+	jobs := job.Read("data")
+	err = t.Execute(res,jobs)
+	//template.Must(t,errors.New("template has error"))
 	if err != nil{
 		log.Fatal(err)
 	}
