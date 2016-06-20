@@ -2,8 +2,6 @@ package commons
 
 import (
 	"bufio"
-	"bytes"
-	"fmt"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"log"
@@ -33,6 +31,9 @@ func GetSSHClient(conf *SSHConfig) (*ssh.Client, error) {
 			ssh.Password(conf.Password),
 		},
 	}
+	if 0 == conf.Port{
+		conf.Port = 22
+	}
 	client, err := ssh.Dial("tcp", conf.Ip+":"+strconv.Itoa(conf.Port), config)
 	if err != nil {
 		//panic("Failed to dial: " + err.Error())
@@ -54,15 +55,17 @@ func ExecuteShell(client *ssh.Client, shell string) {
 		panic("Failed to create session: " + err.Error())
 	}
 	defer session.Close()
+	session.Setenv("LANG","zh_CN.UTF-8")
 	// Once a Session is created, you can execute a single command on
 	// the remote side using the Run method.
-	var b bytes.Buffer
-	session.Stdout = &b
+	//var b bytes.Buffer
+	session.Stdout = os.Stdout
 
 	if err := session.Run(shell); err != nil {
-		panic("Failed to run: " + err.Error())
+		//panic("Failed to run: " + err.Error() + "shell:" + shell)
+		log.Println("Failed to run: " , err.Error() , "shell:" , shell)
 	}
-	fmt.Println(b.String())
+	//fmt.Println(b.String())
 }
 
 func ExecuteShellGo(client *ssh.Client, shell string){
@@ -112,75 +115,4 @@ func GetSftp(client *ssh.Client) *sftp.Client {
 	return sftp
 }
 
-/**
-上传文件
-*/
-func UploadFile(sftp *sftp.Client, localFile, remotePath string) {
-	log.Println(localFile, ",", remotePath)
-	// leave your mark
-	inputFile, inputError := os.Open(localFile)
-	//fileInfo , err := inputFile.Stat();
-	defer inputFile.Close()
 
-	f, err := sftp.Create(remotePath)
-
-	if err != nil {
-		log.Fatal("sftp.Create.err", err)
-	}
-
-	if inputError != nil {
-		fmt.Fprintf(os.Stderr, "File Error: %s\n", inputError)
-	}
-
-	fileReader := bufio.NewReader(inputFile)
-	counter := 0
-	for {
-		buf := make([]byte, 20480)
-		n, err := fileReader.Read(buf)
-		if err == io.EOF{
-			break
-		}
-		counter++
-		//fmt.Printf("%d,%s", n, string(buf))
-		if n == 0 {
-			break
-		}
-		//fmt.Println(string(buf))
-		if _, err := f.Write(buf[0:n]); err != nil {
-			log.Fatal(err)
-		}
-
-	}
-	// check it's there
-	fi, err := sftp.Lstat(remotePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println(fi)
-
-}
-
-/**
-删除文件
-*/
-func RemoveFile(remoateFile string, sftp *sftp.Client) {
-	err := sftp.Remove(remoateFile)
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-/**
-查看文件列表
-*/
-func ListPath(sftp *sftp.Client, remotePath string) {
-	//defer sftp.Close()
-	// walk a directory
-	w := sftp.Walk(remotePath)
-	for w.Step() {
-		if w.Err() != nil {
-			continue
-		}
-		log.Println(w.Path())
-	}
-}

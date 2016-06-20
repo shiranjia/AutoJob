@@ -12,19 +12,25 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+const DataFile  = "data"
+
 /**
 保存
  */
-func Save(job []DeployJob)  {
-	file,err := os.Open("data")
+func save(job []*DeployJob)  {
+	file,err := os.OpenFile(DataFile,os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0777)
 	if os.IsNotExist(err){
-		file,err = os.Create("data")
+		file,err = os.Create(DataFile)
 	}
 	if err != nil {
 		log.Println("save job err",err)
 	}
 	defer file.Close()
 	for _,v := range job {
+		/*for _,c :=range v.RemoteBefore {
+			log.Println(c)
+		}*/
+		//log.Println(v.byte())
 		if v.Config.Password != ""{
 			file.Write(v.byte())
 			file.Write([]byte("\n"))
@@ -36,9 +42,12 @@ func Save(job []DeployJob)  {
 /**
 从文件中读取数据
  */
-func Read(datafile string) []DeployJob  {
-	deploy := make([]DeployJob,0)
-	file,err := os.Open(datafile)
+func Read() []*DeployJob  {
+	deploy := make([]*DeployJob,0)
+	file,err := os.Open(DataFile)
+	if os.IsNotExist(err){
+		return deploy
+	}
 	if err != nil {
 		log.Println("save job err",err)
 	}
@@ -55,6 +64,35 @@ func Read(datafile string) []DeployJob  {
 		deploy = append(deploy,byteToDeploy([]byte(line)))
 	}
 	return deploy
+}
+
+func SaveOrUpdate(job *DeployJob) []*DeployJob {
+	jobs := Read()
+	exit := false
+	for i,j := range jobs {
+		if j.Name == job.Name{
+			jobs[i] = job
+			exit = true
+			break
+		}
+	}
+	if !exit{
+		jobs = append(jobs,job)
+	}
+	save(jobs)
+	return jobs
+}
+
+func Delete(j DeployJob) []*DeployJob {
+	jobs := Read()
+	for i,v := range jobs {
+		if v.Name == j.Name{
+			a := i + 1
+			jobs = append(jobs[0:i] ,jobs[a:]...)
+		}
+	}
+	save(jobs)
+	return jobs
 }
 
 type DeployJob  struct{
@@ -86,7 +124,7 @@ func (d *DeployJob) byte() []byte{
 	return s;
 }
 
-func byteToDeploy(b []byte) DeployJob   {
+func byteToDeploy(b []byte) *DeployJob   {
 	var deployJob DeployJob
 	data := make(map[string][]byte)
 	_ = json.Unmarshal(b,&data)
@@ -123,7 +161,7 @@ func byteToDeploy(b []byte) DeployJob   {
 	_ = json.Unmarshal(d,&ra)
 	deployJob.RemoteAfter = ra
 
-	return deployJob
+	return &deployJob
 }
 
 func (deploy *DeployJob) Deploy()  {
@@ -195,6 +233,9 @@ func (u *UploadJob) run(client *ssh.Client)  {
 本地命令
  */
 func cmd(path, command string, arg []string) {
+	if path=="" || command==""{
+		return
+	}
 	cmd := exec.Command(command)
 	cmd.Args = append(cmd.Args, arg...)
 	cmd.Dir = path

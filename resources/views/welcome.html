@@ -1,121 +1,188 @@
 <html>
 <head><title>welcome</title></head>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
-<script type="application/javascript">
-    function swich(name) {
-        $("[name=span_name]").attr("style","background-color: none;")
-        $("#name" + name).attr("style","background-color: brown;");
-        $("[name=deploy]").attr("style","display:none;")
-        $("#" + name).attr("style","display:block;")
-    }
-</script>
-<style>
-    .h_3{
-        float: left;
-    }
-    table{
-        border: 1px;
-    }
-</style>
 <body>
-{{range $index,$v := .}}
-   <h4 name="t_name" class="h_3" ><a style="border: ridge" href="#" onclick="swich({{$v.Name}})">
-       <span name="span_name" id="name{{$v.Name}}" {{if  eq $index 0 }} style="background-color: brown;" {{end}}>{{$v.Name}}</span></a>
+<div name="t_name" style="float: left;" >
+       {{range $index,$v := .}}
+       <button name="span_name" onclick="swich({{$v.Name}})" id="name{{$v.Name}}"  {{if  eq $index 0 }} style="background-color: brown;" {{end}}>{{$v.Name}}</button>
        &nbsp;
-   </h4>
-{{end}}
+       {{end}}
 
+</div>
+<div>
+    <button onclick="newJob()" id="newJobButton" style="background-color:greenyellow;">new job</button>&nbsp;
+</div>
 </br></br></br></br></br>
+<div id="jobList">
 {{range $index,$v := .}}
 <div name="deploy"  id="{{.Name}}" {{if  gt $index 0 }} style="display:none;" {{end}}>
- <form action="submit" method="post">
-     <div>
-         <table id="config">
-             <thead>SSH Config</thead>
-
-             <tbody>
-             <tr>
-                    <td><label>ssh.userName</label></td><td><input type="text" name="config.User" value="{{.Config.User}}" /></td>
-             </tr>
-             <tr>
-                 <td><label>ssh.password</label></td><td><input type="password" name="config.User" value="{{.Config.Password}}" /></td>
-             </tr>
-             <tr>
-                    <td><label>ssh.ip</label></td><td><input type="text" name="config.ip" value="{{.Config.Ip}}" /></td>
-             </tr>
-
-             {{range .LocalBefore}}
-             <tr>
-                 <td>Path:<input type="text" name="LocalBefore.Path" value="{{.Path}}" /></td>
-                 <td>Command:<input type="text" name="LocalBefore.Command" value="{{.Command}}" /></td>
-                 <td>Args:<input type="text" name="LocalBefore.Args" value="{{range .Args}} {{.}} {{end}}" /></td>
-             </tr>
-             {{end}}
-
-             <tr>
-                 <td><a href="#" id="AddMoreRemoteBefore" class="btn btn-info">点击添加远程命令:</a></span></p></td>
-                 <td>
-                     <div id="InputsRemoteBefore">
-                         {{range .RemoteBefore}}
-                         <div><input type="text" name="RemoteBefore.Command" id="RemoteBefore.Command_{{$index}}" value="{{.Command}}"/><a href="#" class="RemoteBeforeremoveclass">×</a></div>
-                         {{end}}
-                     </div>
-                 </td>
-             </tr>
-
-             <tr>
-                 <td><label>LocalPath</label></td><td><input type="text" name="UploadJob.LocalPath" value="{{.UploadJob.LocalPath}}" style="width: 500px"/></td>
-                 <td><label>RemotePath</label></td><td><input type="text" name="UploadJob.RemotePath" value="{{.UploadJob.RemotePath}}" style="width: 500px"/></td>
-             </tr>
-
-
-             {{range .LocalAfter}}
-             <tr>
-                 <td><label>Path</label></td><td><input type="text" name="LocalAfter.Path" value="{{.Path}}" /></td>
-                 <td><label>Command</label></td><td><input type="text" name="LocalAfter.Command" value="{{.Command}}" /></td>
-                 <td><label>Args</label></td><td><input type="text" name="LocalAfter.Args" value="{{range .Args}} {{.}} {{end}}" /></td>
-             </tr>
-             {{end}}
-
-             {{range .RemoteAfter}}
-             <tr>
-                 <td><label>Command</label></td><td><input type="text" name="RemoteAfter.Command" value="{{.Command}}" style="width: 500px"/></td>
-             </tr>
-             {{end}}
-             </tbody>
-         </table>
-     </div>
-     <button>save</button><button>deploy</button>
+ <form action="#" method="post" id="form_{{.Name}}">
+         <div>
+             <input type="hidden" name="deploy.Name" value="{{.Name}}" />
+             <h3><label>{{.Name}}</label></h3>
+         </div>
+     <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+     </br>
+        <div>
+             <label>ssh.userName</label><input type="text" name="config.User" value="{{.Config.User}}" />
+             <label>ssh.password</label><input type="password" name="config.Password" value="{{.Config.Password}}" />
+             <label>ssh.ip</label><input type="text" name="config.ip" value="{{.Config.Ip}}" />
+        </div>
+     <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+     </br>
+         <div>
+         本地命令
+         (多条换行 执行路径;命令;参数(参数用空格隔开) example:E:\github\ticket.h5\web;mvn;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 ):
+         <textarea name="LocalBefore.Command" class="n" rows="3" cols="200">{{range .LocalBefore}}{{if ne .Path ""}}{{.Path}};{{.Command}};{{range .Args}}{{.}} {{end}}-n-{{end}}{{end}}</textarea>
+         </div>
+     <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+     </br>
+         <div>
+             远程命令(多条换行):<textarea name="RemoteBefore.Command" class="n" rows="3" cols="180">{{range .RemoteBefore}}{{.Command}}-n-{{end}}</textarea>
+         </div>
+     <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+     </br>
+         <div>
+             上传文件:
+             本地目录： <input name="Upload.Path" type="text" size="78" value="{{.UploadJob.LocalPath}}"/>
+             远程目录：<input name="Upload.RemotePath" type="text" size="78" value="{{.UploadJob.RemotePath}}"/>
+         </div>
+     <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+     </br>
+         <div>
+             本地命令
+             (多条换行 执行路径;命令;参数(参数用空格隔开) example:E:\github\ticket.h5\web;mav;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 ):
+             <textarea name="LocalAfter.Command" class="n" rows="3" cols="200">{{range .LocalAfter}}{{if ne .Path ""}}{{.Path}};{{.Command}};{{range .Args}}{{.}} {{end}}-n-{{end}}{{end}}</textarea>
+         </div>
+     <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+     </br>
+         <div>
+             远程命令(多条换行):
+             <textarea id="remoteAfter{{$index}}" class="n" name="RemoteAfter.Command" rows="3" cols="180">{{range .RemoteAfter}}{{.Command}}-n-{{end}}</textarea>
+         </div>
+     <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+     </br>
+     <button type="button" onclick="deploy({{.Name}})">deploy</button>&nbsp;<button type="button" onclick="update({{.Name}})">update</button>&nbsp;<button type="button" onclick="deleteJob({{.Name}})">delete</button>
  </form>
 </div>
 {{end}}
+</div>
+<div id="newJob" style="display: none">
+    <form action="saveOrUpdate" method="post">
+        <div>
+            <h3>job.Name (不可重复) :<input name="deploy.Name" type="text"  value=""/></h3>
+        </div>
+        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+        </br>
+        <div>
+            <label>ssh.userName:</label><input type="text" name="config.User" />
+            <label>ssh.password:</label><input type="text" name="config.Password" />
+            <label>ssh.ip:</label><input type="text" name="config.ip" />
+        </div>
+        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+        </br>
+        <div>
+            本地命令
+            (多条换行 执行路径;命令;参数(参数用空格隔开) example:E:\github\ticket.h5\web;mvn;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 ):
+            <textarea name="LocalBefore.Command" rows="3" cols="200"></textarea>
+        </div>
+        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+        </br>
+        <div>
+            远程命令(多条换行):<textarea name="RemoteBefore.Command" rows="3" cols="180"></textarea>
+        </div>
+        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+        </br>
+        <div>
+            上传文件:
+            本地目录： <input name="Upload.Path" type="text" size="78" />
+            远程目录： <input name="Upload.RemotePath" type="text" size="78"/>
+        </div>
+        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+        </br>
+        <div>
+            本地命令
+            (多条换行 执行路径;命令;参数(参数用空格隔开) example:E:\github\ticket.h5\web;mav;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 ):
+            <textarea name="LocalAfter.Command" rows="3" cols="200"></textarea>
+        </div>
+        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+        </br>
+        <div>
+            远程命令(多条换行):
+            <textarea name="RemoteAfter.Command" rows="3" cols="180"></textarea>
+        </div>
+        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
+        </br>
+        <button>save</button>&nbsp;
+    </form>
+</div>
 
 <script>
+    var url = window.location.href;
+    if(url.indexOf("index")){
+
+    }
 $(document).ready(function() {
-        var MaxInputs       = 8; //maximum input boxes allowed
-        var InputsWrapper   = $("#InputsRemoteBefore"); //Input boxes wrapper ID
-        var AddButton       = $("#AddMoreRemoteBefore"); //Add button ID
-        var x = InputsWrapper.length; //initlal text box count
-        var FieldCount=1; //to keep track of text box added
-        $(AddButton).click(function (e)  //on add input button click
-        {
-            if(x <= MaxInputs) //max input box allowed
-            {
-                FieldCount++; //text box added increment
-                //add input box
-                $(InputsWrapper).append('<div><input type="text" name="RemoteBefore.Command" id="RemoteBefore.Command_'+ FieldCount +'" /><a href="#" class="RemoteBeforeremoveclass">×</a></div>');
-                x++; //text box increment
-            }
-            return false;
-        });
-        $("body").on("click",".RemoteBeforeremoveclass", function(e){ //user click on remove text
-            if( x > 1 ) {
-                $(this).parent('div').remove(); //remove text box
-                x--; //decrement textbox
-            }
-            return false;
-        })
+    var text = $("textarea.n")
+    for(var i=0;i<text.length;i++){
+        t = $(text[i]).html();
+        while (t.indexOf("-n-") > 0){
+            t = t.replace("-n-","\r\n");
+        }
+        $(text[i]).html(t)
+    }
+    /*text = $("textarea.LocalAfter")
+    for(var i=0;i<text.length;i++){
+        t = $(text[i]).html();
+        while (t.indexOf("-n-") > 0){
+            t = t.replace("-n-","\r\n");
+        }
+        $(text[i]).html(t)
+    }
+    text = $("textarea.LocalBefore")
+    for(var i=0;i<text.length;i++){
+        t = $(text[i]).html();
+        while (t.indexOf("-n-") > 0){
+            t = t.replace("-n-","\r\n");
+        }
+        $(text[i]).html(t)
+    }
+    text = $("textarea.RemoteBefore")
+    for(var i=0;i<text.length;i++){
+        t = $(text[i]).html();
+        while (t.indexOf("-n-") > 0){
+            t = t.replace("-n-","\r\n");
+        }
+        $(text[i]).html(t)
+    }*/
 });
+function swich(name) {
+    $("#jobList").attr("style","display:block;")
+    $("#newJob").attr("style","display:none;")
+    $("[name=span_name]").attr("style","background-color: none;")
+    $("#name" + name).attr("style","background-color: brown;");
+    $("[name=deploy]").attr("style","display:none;")
+    $("#" + name).attr("style","display:block;")
+}
+function newJob() {
+        $("#jobList").attr("style","display:none;")
+        $("#newJob").attr("style","display:block;")
+    }
+function deploy(jobName){
+    var form = $("#form_" + jobName);
+    $(form).attr("action","deploy");
+    $(form).submit();
+}
+function update(jobName){
+    var form = $("#form_" + jobName)
+    $(form).attr("action","saveOrUpdate");
+    $(form).submit();
+}
+function deleteJob(jobName){
+    var form = $("#form_" + jobName)
+    $(form).attr("action","delete");
+    $(form).submit();
+}
 </script>
 </body>
 </html>

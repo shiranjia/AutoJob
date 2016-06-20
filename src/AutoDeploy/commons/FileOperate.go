@@ -5,6 +5,8 @@ import (
 	"golang.org/x/crypto/ssh"
 	"log"
 	"os"
+	"bufio"
+	"io"
 )
 
 const Separator = "/"
@@ -51,7 +53,80 @@ func uploadPath(file string, sftp *sftp.Client, remotePath string) {
 	} else {
 		//copy file
 		log.Println(remotePath + Separator + fileInfo.Name())
-		UploadFile(sftp, file, remotePath+Separator+fileInfo.Name())
+		uploadFile(sftp, file, remotePath+Separator+fileInfo.Name())
 	}
 
+}
+
+/**
+上传文件
+*/
+func uploadFile(sftp *sftp.Client, localFile, remotePath string) {
+	log.Println(localFile, ",", remotePath)
+	// leave your mark
+	inputFile, inputError := os.Open(localFile)
+	//fileInfo , err := inputFile.Stat();
+	defer inputFile.Close()
+
+	f, err := sftp.Create(remotePath)
+
+	if err != nil {
+		log.Fatal("sftp.Create.err", err)
+	}
+
+	if inputError != nil {
+		log.Println("File Error: %s\n", inputError)
+	}
+
+	fileReader := bufio.NewReader(inputFile)
+	counter := 0
+	for {
+		buf := make([]byte, 20480)
+		n, err := fileReader.Read(buf)
+		if err == io.EOF{
+			break
+		}
+		counter++
+		//fmt.Printf("%d,%s", n, string(buf))
+		if n == 0 {
+			break
+		}
+		//fmt.Println(string(buf))
+		if _, err := f.Write(buf[0:n]); err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	// check it's there
+	fi, err := sftp.Lstat(remotePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(fi)
+
+}
+
+/**
+删除文件
+*/
+func RemoveFile(remoateFile string, sftp *sftp.Client) {
+	err := sftp.Remove(remoateFile)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+/**
+查看文件列表
+*/
+func ListPath(sftp *sftp.Client, remotePath string) {
+	//defer sftp.Close()
+	// walk a directory
+	w := sftp.Walk(remotePath)
+	for w.Step() {
+		if w.Err() != nil {
+			continue
+		}
+		log.Println(w.Path())
+	}
 }

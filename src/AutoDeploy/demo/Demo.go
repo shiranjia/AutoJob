@@ -51,6 +51,21 @@ func Route() {
 	fmt.Println("done")
 }
 
+func WriteFile()  {
+	file,err:=os.OpenFile("data",os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0777);
+	if os.IsNotExist(err){
+		file,err = os.Create("data")
+	}
+	if err != nil{
+		log.Fatal(err)
+	}
+	defer file.Close()
+	//file.Seek(1,0)
+
+	n,err := file.WriteAt([]byte("sdfgr"),0);
+	log.Println(n,";;;",err)
+}
+
 func Reflect() {
 	p := persion{"asfef", 21}
 	var i interface{}
