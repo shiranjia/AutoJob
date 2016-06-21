@@ -27,10 +27,6 @@ func save(job []*DeployJob)  {
 	}
 	defer file.Close()
 	for _,v := range job {
-		/*for _,c :=range v.RemoteBefore {
-			log.Println(c)
-		}*/
-		//log.Println(v.byte())
 		if v.Config.Password != ""{
 			file.Write(v.byte())
 			file.Write([]byte("\n"))
@@ -60,7 +56,6 @@ func Read() []*DeployJob  {
 				break
 			}
 		}
-		//fmt.Printf(line)
 		deploy = append(deploy,byteToDeploy([]byte(line)))
 	}
 	return deploy

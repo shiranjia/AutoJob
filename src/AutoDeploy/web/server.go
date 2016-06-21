@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -11,14 +10,17 @@ import (
 	"strings"
 )
 
-const temp  = "resources/views/welcome.html"
+const(
+	temp  = "resources/views/welcome.html"
+)
+
 
 func Service() {
-	http.HandleFunc("/index",index)
+	http.HandleFunc("/",index)
 	http.HandleFunc("/saveOrUpdate", saveOrUpdate)
 	http.HandleFunc("/delete", delete)
 	http.HandleFunc("/deploy",deploy)
-
+	http.HandleFunc("/loading",loading)
 	err := http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal(err)
@@ -26,16 +28,28 @@ func Service() {
 }
 
 func index(res http.ResponseWriter, req *http.Request) {
+	//t := getTemplateFromFile()
+	t := getTemplateFromString()
+	jobs := job.Read()
+	err := t.Execute(res,jobs)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
+func getTemplateFromFile() *template.Template  {
 	t,err := template.ParseFiles(temp)
 	if err != nil{
-		log.Fatal(err)
+		log.Println(err)
+		return nil
 	}
-	jobs := job.Read()
-	err = t.Execute(res,jobs)
-	//template.Must(t,errors.New("template has error"))
-	if err != nil{
-		log.Fatal(err)
-	}
+	return t
+}
+
+func getTemplateFromString() *template.Template {
+	t := template.New("deploy")
+	t.Parse(commons.Html)
+	return t;
 }
 
 func saveOrUpdate(res http.ResponseWriter, req *http.Request) {
@@ -44,31 +58,25 @@ func saveOrUpdate(res http.ResponseWriter, req *http.Request) {
 		io.WriteString(res, "name must not null")
 	}
 	job.SaveOrUpdate(&j)
-	http.Redirect(res,req,"/index",http.StatusMovedPermanently)
-	/*t,err := template.ParseFiles(temp)
-	if err != nil{
-		log.Fatal(err)
-	}
-	err = t.Execute(res,jobs)
-	if err != nil{
-		log.Fatal(err)
-	}*/
+	http.Redirect(res,req,"/",http.StatusMovedPermanently)
 	return
 }
 
 func delete(res http.ResponseWriter, req *http.Request) {
 	j := toJob(req)
 	job.Delete(j)
-	http.Redirect(res,req,"/index",http.StatusMovedPermanently)
+	http.Redirect(res,req,"/",http.StatusMovedPermanently)
 }
 
 func deploy(res http.ResponseWriter, req *http.Request) {
 	deploy := toJob(req)
 	go deploy.Deploy()
+	//log.Println(req.Form)
+	http.Redirect(res,req,"/loading",http.StatusMovedPermanently)
+}
 
-	fmt.Println(req.Header)
-	fmt.Println(req.Form)
-	io.WriteString(res, "success")
+func loading(res http.ResponseWriter, req *http.Request) {
+	io.WriteString(res, "<html><head><title>deploying...</title></head><body><img src='http://img12.360buyimg.com/piao/jfs/t2971/357/809642283/282981/3ea2914a/576926baNf53c63d4.gif'><a href='/'>return</a></body></html>")
 }
 
 func toJob(req *http.Request) job.DeployJob {
@@ -93,7 +101,7 @@ func toJob(req *http.Request) job.DeployJob {
 	rb := strings.Split(remoteBefore,"\n")
 	var remoteBeforeCom []*job.RemoteComm
 	for _,c := range rb {
-		log.Println("remote shell:",c)
+		//log.Println("remote shell:",c)
 		c = strings.Replace(c,"\r","",-1)
 		if "" != c {
 			remoteBeforeCom = append(remoteBeforeCom,&job.RemoteComm{false,c})
@@ -128,7 +136,7 @@ func toJob(req *http.Request) job.DeployJob {
 	ra := strings.Split(remoteAfter,"\n")
 	var remoteAfterCom []*job.RemoteComm
 	for _,c := range ra {
-		log.Println("remote shell:",c)
+		//log.Println("remote shell:",c)
 		c = strings.Replace(c,"\r","",-1)
 		if "" != c {
 			remoteAfterCom = append(remoteAfterCom,&job.RemoteComm{false,c})

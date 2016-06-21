@@ -85,7 +85,7 @@ func ExecuteShellGo(client *ssh.Client, shell string){
 
 	out, err := session.StdoutPipe()
 	if err != nil {
-		log.Fatal("estart shell err:", err)
+		log.Println("estart shell err:", err)
 	}
 	read := bufio.NewReader(out)
 	session.Setenv("LANG","zh_CN.UTF-8")
@@ -110,7 +110,7 @@ func ExecuteShellGo(client *ssh.Client, shell string){
 func GetSftp(client *ssh.Client) *sftp.Client {
 	sftp, err := sftp.NewClient(client)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("GetSftp.error",err)
 	}
 	return sftp
 }

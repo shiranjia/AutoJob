@@ -1,7 +1,12 @@
 <html>
 <head><title>welcome</title></head>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.0.0.min.js"></script>
+<style>
+    .black{  background-image: url(http://s5.51cto.com/wyfs02/M02/73/4B/wKiom1X5NxXxpjKBAADbGtrjmj4613.jpg);  height: 175px;  }
+    .listBlack{  background-image: url(http://i44.tinypic.com/33f5ev7.jpg);  }
+</style>
 <body>
+<div class="black">
 <div name="t_name" style="float: left;" >
        {{range $index,$v := .}}
        <button name="span_name" onclick="swich({{$v.Name}})" id="name{{$v.Name}}"  {{if  eq $index 0 }} style="background-color: brown;" {{end}}>{{$v.Name}}</button>
@@ -12,14 +17,15 @@
 <div>
     <button onclick="newJob()" id="newJobButton" style="background-color:greenyellow;">new job</button>&nbsp;
 </div>
-</br></br></br></br></br>
-<div id="jobList">
+</div>
+</br>
+<div id="jobList" class="listBlack">
 {{range $index,$v := .}}
 <div name="deploy"  id="{{.Name}}" {{if  gt $index 0 }} style="display:none;" {{end}}>
  <form action="#" method="post" id="form_{{.Name}}">
          <div>
              <input type="hidden" name="deploy.Name" value="{{.Name}}" />
-             <h3><label>{{.Name}}</label></h3>
+             <h3>jobName：<label>{{.Name}}</label></h3>
          </div>
      <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
      </br>
@@ -67,10 +73,10 @@
 </div>
 {{end}}
 </div>
-<div id="newJob" style="display: none">
+<div id="newJob" style="display: none" class="listBlack">
     <form action="saveOrUpdate" method="post">
         <div>
-            <h3>job.Name (不可重复) :<input name="deploy.Name" type="text"  value=""/></h3>
+            <h3>jobName (不可重复)：<input name="deploy.Name" type="text"  value=""/></h3>
         </div>
         <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
         </br>
@@ -131,30 +137,7 @@ $(document).ready(function() {
         }
         $(text[i]).html(t)
     }
-    /*text = $("textarea.LocalAfter")
-    for(var i=0;i<text.length;i++){
-        t = $(text[i]).html();
-        while (t.indexOf("-n-") > 0){
-            t = t.replace("-n-","\r\n");
-        }
-        $(text[i]).html(t)
-    }
-    text = $("textarea.LocalBefore")
-    for(var i=0;i<text.length;i++){
-        t = $(text[i]).html();
-        while (t.indexOf("-n-") > 0){
-            t = t.replace("-n-","\r\n");
-        }
-        $(text[i]).html(t)
-    }
-    text = $("textarea.RemoteBefore")
-    for(var i=0;i<text.length;i++){
-        t = $(text[i]).html();
-        while (t.indexOf("-n-") > 0){
-            t = t.replace("-n-","\r\n");
-        }
-        $(text[i]).html(t)
-    }*/
+
 });
 function swich(name) {
     $("#jobList").attr("style","display:block;")

@@ -7,12 +7,12 @@ import (
 	"fmt"
 )
 
-func Insert()  {
-	db, err := sql.Open("mysql", "root:root@tcp(192.168.104.83:3306)/piaowu")
+func Select()  {
+	db, err := sql.Open("mysql", "root:root@tcp(192.168.104.83:3306)/***")
 	checkErr(err)
 	defer db.Close()
 	// Execute the query
-	rows, err := db.Query("SELECT * FROM ticket_order")
+	rows, err := db.Query("SELECT * FROM order")
 	if err != nil {
 		panic(err.Error()) // proper error handling instead of panic in your app
 	}

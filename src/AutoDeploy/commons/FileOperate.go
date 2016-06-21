@@ -39,7 +39,7 @@ func uploadPath(file string, sftp *sftp.Client, remotePath string) {
 		//mkdir
 		path := remotePath + Separator + fileInfo.Name()
 		sftp.Mkdir(path)
-		log.Println(path)
+		//log.Println(path)
 
 		fileInfo, err := inputFile.Readdir(-1)
 		if err == nil {
@@ -52,7 +52,7 @@ func uploadPath(file string, sftp *sftp.Client, remotePath string) {
 
 	} else {
 		//copy file
-		log.Println(remotePath + Separator + fileInfo.Name())
+		//log.Println(remotePath + Separator + fileInfo.Name())
 		uploadFile(sftp, file, remotePath+Separator+fileInfo.Name())
 	}
 
@@ -71,7 +71,7 @@ func uploadFile(sftp *sftp.Client, localFile, remotePath string) {
 	f, err := sftp.Create(remotePath)
 
 	if err != nil {
-		log.Fatal("sftp.Create.err", err)
+		log.Println("sftp.Create.err", err)
 	}
 
 	if inputError != nil {
@@ -93,14 +93,14 @@ func uploadFile(sftp *sftp.Client, localFile, remotePath string) {
 		}
 		//fmt.Println(string(buf))
 		if _, err := f.Write(buf[0:n]); err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 
 	}
 	// check it's there
 	fi, err := sftp.Lstat(remotePath)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("sftp.Lstat.error",err)
 	}
 	log.Println(fi)
 
