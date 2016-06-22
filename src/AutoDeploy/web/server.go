@@ -50,7 +50,7 @@ func index(res http.ResponseWriter, req *http.Request) {
 			set = true
 		}
 	}
-	if !set{
+	if !set && len(jobs) > 0 {
 		jobs[0].Show = true
 	}
 	err := t.Execute(res,jobs)
