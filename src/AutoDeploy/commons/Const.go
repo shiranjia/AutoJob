@@ -13,7 +13,7 @@ const Html  = "<html>\n" +
 "<div class=\"black\">\n" +
 "<div name=\"t_name\" style=\"float: left;\" >\n" +
 "       {{range $index,$v := .}}\n" +
-"       <button name=\"span_name\" onclick=\"swich({{$v.Name}})\" id=\"name{{$v.Name}}\"  {{if  eq $index 0 }} style=\"background-color: brown;\" {{end}}>{{$v.Name}}</button>\n" +
+"       <button name=\"span_name\" onclick=\"swich({{$v.Name}})\" id=\"name{{$v.Name}}\"  {{if  eq .Show true }} style=\"background-color: brown;\" {{end}}>{{$v.Name}}</button>\n" +
 "       &nbsp;\n" +
 "       {{end}}\n" +
 "\n" +
@@ -25,7 +25,7 @@ const Html  = "<html>\n" +
 "</br>\n" +
 "<div id=\"jobList\" class=\"listBlack\">\n" +
 "{{range $index,$v := .}}\n" +
-"<div name=\"deploy\"  id=\"{{.Name}}\" {{if  gt $index 0 }} style=\"display:none;\" {{end}}>\n" +
+"<div name=\"deploy\"  id=\"{{.Name}}\" {{if  ne .Show true }} style=\"display:none;\" {{end}}>\n" +
 " <form action=\"#\" method=\"post\" id=\"form_{{.Name}}\">\n" +
 "         <div>\n" +
 "             <input type=\"hidden\" name=\"deploy.Name\" value=\"{{.Name}}\" />\n" +
@@ -86,7 +86,7 @@ const Html  = "<html>\n" +
 "        </br>\n" +
 "        <div>\n" +
 "            <label>ssh.userName:</label><input type=\"text\" name=\"config.User\" />\n" +
-"            <label>ssh.password:</label><input type=\"text\" name=\"config.Password\" />\n" +
+"            <label>ssh.password:</label><input type=\"password\" name=\"config.Password\" />\n" +
 "            <label>ssh.ip:</label><input type=\"text\" name=\"config.ip\" />\n" +
 "        </div>\n" +
 "        <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>\n" +
@@ -164,7 +164,15 @@ const Html  = "<html>\n" +
 "    var form = $(\"#form_\" + jobName)\n" +
 "    $(form).attr(\"action\",\"saveOrUpdate\");\n" +
 "    $(form).submit();\n" +
-"}function deleteJob(jobName){var form = $(\"#form_\" + jobName);$(form).attr(\"action\",\"delete\");$(form).submit();}</script></body></html>"
+"}\n" +
+"function deleteJob(jobName){\n" +
+"    var form = $(\"#form_\" + jobName)\n" +
+"    $(form).attr(\"action\",\"delete\");\n" +
+"    $(form).submit();\n" +
+"}\n" +
+"</script>\n" +
+"</body>\n" +
+"</html>"
 
 type RemoteOutPut struct{
 	Name string

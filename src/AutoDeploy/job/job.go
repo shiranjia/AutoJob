@@ -98,6 +98,7 @@ type DeployJob  struct{
 	UploadJob *UploadJob
 	LocalAfter []*LocalComm
 	RemoteAfter []*RemoteComm
+	Show bool
 }
 
 func (d *DeployJob) byte() []byte{

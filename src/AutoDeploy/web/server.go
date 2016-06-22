@@ -8,11 +8,21 @@ import (
 	"AutoDeploy/job"
 	"AutoDeploy/commons"
 	"strings"
+	"github.com/astaxie/session"
+	_ "github.com/astaxie/session/providers/memory"
 )
 
 const(
 	temp  = "resources/views/welcome.html"
 )
+
+var globalSessions *session.Manager
+
+//然后在init函数中初始化
+func init() {
+	globalSessions, _ = session.NewManager("memory", "gosessionid", 3600)
+	go globalSessions.GC()
+}
 
 
 func Service() {
@@ -30,7 +40,19 @@ func Service() {
 func index(res http.ResponseWriter, req *http.Request) {
 	//t := getTemplateFromFile()
 	t := getTemplateFromString()
+	req.ParseForm()
+	name := globalSessions.SessionStart(res, req).Get("name")
 	jobs := job.Read()
+	set := false
+	for _,v := range jobs {
+		if name == v.Name{
+			v.Show = true
+			set = true
+		}
+	}
+	if !set{
+		jobs[0].Show = true
+	}
 	err := t.Execute(res,jobs)
 	if err != nil{
 		log.Fatal(err)
@@ -58,7 +80,9 @@ func saveOrUpdate(res http.ResponseWriter, req *http.Request) {
 		io.WriteString(res, "name must not null")
 	}
 	job.SaveOrUpdate(&j)
-	http.Redirect(res,req,"/",http.StatusMovedPermanently)
+	session := globalSessions.SessionStart(res, req)
+	session.Set("name",j.Name)
+	http.Redirect(res,req,"/" ,http.StatusMovedPermanently)
 	return
 }
 
@@ -112,17 +136,25 @@ func toJob(req *http.Request) job.DeployJob {
 	var localBeforeCom []*job.LocalComm
 	lb := strings.Split(localBefore,"\n")
 	for _,c := range lb {
+		//log.Println(c)
 		com := strings.Split(c,";")
 		var beforeCom job.LocalComm;
 		beforeCom.IsGo = false
 		for i,v := range com {
+			if v == ""{
+				continue
+			}
 			if i == 0 {
 				beforeCom.Path = v
 			}else if i == 1 {
 				beforeCom.Command = v
 			}else if i == 2 {
 				args := strings.Split(v," ")
-				beforeCom.Args = args
+				for _,v := range args {
+					if "" != v && "\r" != v{
+						beforeCom.Args = append(beforeCom.Args,v)
+					}
+				}
 			}
 		}
 		localBeforeCom = append(localBeforeCom,&beforeCom)
@@ -151,6 +183,9 @@ func toJob(req *http.Request) job.DeployJob {
 		var afterCom job.LocalComm;
 		afterCom.IsGo = false
 		for i,v := range com {
+			if v == ""{
+				continue
+			}
 			if i == 0 {
 				afterCom.Path = v
 			}else if i == 1 {

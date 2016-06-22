@@ -9,7 +9,7 @@
 <div class="black">
 <div name="t_name" style="float: left;" >
        {{range $index,$v := .}}
-       <button name="span_name" onclick="swich({{$v.Name}})" id="name{{$v.Name}}"  {{if  eq $index 0 }} style="background-color: brown;" {{end}}>{{$v.Name}}</button>
+       <button name="span_name" onclick="swich({{$v.Name}})" id="name{{$v.Name}}"  {{if  eq .Show true }} style="background-color: brown;" {{end}}>{{$v.Name}}</button>
        &nbsp;
        {{end}}
 
@@ -21,7 +21,7 @@
 </br>
 <div id="jobList" class="listBlack">
 {{range $index,$v := .}}
-<div name="deploy"  id="{{.Name}}" {{if  gt $index 0 }} style="display:none;" {{end}}>
+<div name="deploy"  id="{{.Name}}" {{if  ne .Show true }} style="display:none;" {{end}}>
  <form action="#" method="post" id="form_{{.Name}}">
          <div>
              <input type="hidden" name="deploy.Name" value="{{.Name}}" />
@@ -82,7 +82,7 @@
         </br>
         <div>
             <label>ssh.userName:</label><input type="text" name="config.User" />
-            <label>ssh.password:</label><input type="text" name="config.Password" />
+            <label>ssh.password:</label><input type="password" name="config.Password" />
             <label>ssh.ip:</label><input type="text" name="config.ip" />
         </div>
         <span>---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span>
