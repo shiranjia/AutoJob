@@ -5,7 +5,7 @@ an auto deploy tool  自动部署工具
 任意添加远程命令
 任意上传文件或目录
 例子：
-ssh.userName root ssh.password ••••••••  ssh.ip  192.168.104.141
+ssh.userName: root ssh.password: ••••••••  ssh.ip:  192.168.104.141
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- 
 本地命令 (多条换行 执行路径;命令;参数(参数用空格隔开) example:E:\github\web;mvn;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 ): 
 E:\github\web;mvn;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 
