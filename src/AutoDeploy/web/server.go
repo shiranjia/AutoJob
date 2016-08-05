@@ -179,6 +179,9 @@ func toJob(req *http.Request) job.DeployJob {
 	var localAfterCom []*job.LocalComm
 	la := strings.Split(localAfter,"\n")
 	for _,c := range la {
+		if c == ""{
+			continue
+		}
 		com := strings.Split(c,";")
 		var afterCom job.LocalComm;
 		afterCom.IsGo = false
@@ -192,7 +195,11 @@ func toJob(req *http.Request) job.DeployJob {
 				afterCom.Command = v
 			}else if i == 2 {
 				args := strings.Split(v," ")
-				afterCom.Args = args
+				for _,v := range args {
+					if "" != v && "\r" != v{
+						afterCom.Args = append(afterCom.Args,v)
+					}
+				}
 			}
 		}
 		localAfterCom = append(localAfterCom,&afterCom)
