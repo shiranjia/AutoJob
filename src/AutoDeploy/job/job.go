@@ -36,6 +36,32 @@ func save(job []*DeployJob)  {
 }
 
 /**
+从制定目录中读取数据
+ */
+func ReadFrom(path string)  []*DeployJob {
+	deploy := make([]*DeployJob,0)
+	file,err := os.Open(path)
+	if os.IsNotExist(err){
+		return deploy
+	}
+	if err != nil {
+		log.Println("save job err",err)
+	}
+	defer file.Close()
+	read := bufio.NewReader(file)
+	for{
+		line,err := read.ReadString('\n')
+		if err!=nil {
+			if err == io.EOF{
+				break
+			}
+		}
+		deploy = append(deploy,byteToDeploy([]byte(line)))
+	}
+	return deploy
+}
+
+/**
 从文件中读取数据
  */
 func Read() []*DeployJob  {
