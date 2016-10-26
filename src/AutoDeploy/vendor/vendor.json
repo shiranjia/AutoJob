@@ -1,0 +1,17 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "reCHTQ/rwQDy59UBRpg7kgod5bs=",
+			"path": "github.com/pkg/sftp",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "HggTVtTwNkLZiUKDgw9U8SBHNEc=",
+			"path": "golang.org/x/crypto/ssh",
+			"revision": ""
+		}
+	],
+	"rootPath": "AutoDeploy"
+}

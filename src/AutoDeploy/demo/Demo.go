@@ -28,7 +28,7 @@ func Route() {
 				fmt.Println("c1------------------------------------------------------------------------------", v1)
 			case v2 := <-c2:
 				fmt.Println("c2-------------------------------------------------------------------------------", v2)
-			case <-time.After(1 * time.Microsecond):
+			case <- time.After(1 * time.Microsecond):
 				{
 					fmt.Println("time out:", count)
 					close(c1)
