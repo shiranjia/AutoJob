@@ -182,3 +182,12 @@ func (s *RemoteOutPut) Write(p []byte) (n int, err error)  {
 	log.Printf("remote.out:",string(p))
 	return len(p),nil
 }
+
+func Try(fun func() , handler func(interface{})){
+	defer func(){
+		if err:=recover();err!=nil{
+			handler(err)
+		}
+	}()
+	fun()
+}
