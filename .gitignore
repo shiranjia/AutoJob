@@ -1,6 +1,7 @@
 *.iml
 .idea/
 */target/
+.cache/
 */bin/
 */pkg/
 data
