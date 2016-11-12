@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"io"
 	"time"
+	"github.com/pkg/errors"
 )
 
 /**
@@ -25,6 +26,9 @@ type SSHConfig struct {
 创建ssh客户端
 */
 func GetSSHClient(conf *SSHConfig) (*ssh.Client, error) {
+	if conf.Password == ""{
+		return nil , errors.New("conf param null!")
+	}
 	config := &ssh.ClientConfig{
 		User: conf.User,
 		Auth: []ssh.AuthMethod{

@@ -27,10 +27,10 @@ func save(job []*DeployJob)  {
 	}
 	defer file.Close()
 	for _,v := range job {
-		if v.Config.Password != ""{
+		//if v.Config.Password != ""{
 			file.Write(v.byte())
 			file.Write([]byte("\n"))
-		}
+		//}
 
 	}
 }
@@ -187,11 +187,18 @@ func byteToDeploy(b []byte) *DeployJob   {
 }
 
 func (deploy *DeployJob) Deploy()  {
-	client, err := commons.GetSSHClient(deploy.Config)//*ssh.Client
+	var client *ssh.Client
+	var err error
+	commons.Try(func(){
+		client, err = commons.GetSSHClient(deploy.Config)//*ssh.Client
+	},func(interface{}){})
+
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+	}else {
+		defer client.Close()
 	}
-	defer client.Close()
+
 	for _,lb := range deploy.LocalBefore {
 		lb.run()
 	}
@@ -232,11 +239,15 @@ type RemoteComm  struct{
 }
 
 func (r *RemoteComm) run(client *ssh.Client)  {
-	if r.IsGo{
-		commons.ExecuteShellGo(client,r.Command)
-	}else {
-		commons.ExecuteShell(client,r.Command)
-	}
+	commons.Try(func() {
+		if r.IsGo{
+			commons.ExecuteShellGo(client,r.Command)
+		}else {
+			commons.ExecuteShell(client,r.Command)
+		}
+	} , func(err interface{}) {
+		log.Println("RemoteComm.run.panic:",err)
+	})
 }
 
 type UploadJob  struct{
@@ -245,10 +256,14 @@ type UploadJob  struct{
 }
 
 func (u *UploadJob) run(client *ssh.Client)  {
-	if u.RemotePath == ""{
-		u.RemotePath = "/tmp"
-	}
-	commons.UploadPath(client,u.LocalPath,u.RemotePath)
+	commons.Try(func() {
+		if u.RemotePath == ""{
+			u.RemotePath = "/tmp"
+		}
+		commons.UploadPath(client,u.LocalPath,u.RemotePath)
+	}, func(err interface{}) {
+		log.Println("UploadJob.run.paanic:",err)
+	})
 }
 
 /**
@@ -267,5 +282,5 @@ func cmd(path, command string, arg []string) {
 	cmd.Stdout = &b
 	cmd.Stdout = os.Stdout
 	cmd.Run()
-	//log.Println(b.String())
+	log.Println(b.String())
 }
