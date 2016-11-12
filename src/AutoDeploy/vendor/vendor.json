@@ -3,12 +3,46 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "reCHTQ/rwQDy59UBRpg7kgod5bs=",
-			"path": "github.com/pkg/sftp",
+			"checksumSHA1": "2MWdqOMWeXGogvJKNFln73+kutw=",
+			"path": "github.com/astaxie/session",
+			"revision": "95d7fe18579cfbdd564189bd3ccc30b17aa06d35",
+			"revisionTime": "2013-04-08T05:01:57Z"
+		},
+		{
+			"checksumSHA1": "Dv+/ZVQ23JAJeTxFDU7ck36iT3s=",
+			"path": "github.com/astaxie/session/providers/memory",
+			"revision": "95d7fe18579cfbdd564189bd3ccc30b17aa06d35",
+			"revisionTime": "2013-04-08T05:01:57Z"
+		},
+		{
+			"checksumSHA1": "nvGuYn0dr8PhD6jFH9N/VGJQ2gg=",
+			"path": "github.com/kr/fs",
+			"revision": "2788f0dbd16903de03cb8186e5c7d97b69ad387b",
+			"revisionTime": "2013-11-06T22:25:44Z"
+		},
+		{
+			"checksumSHA1": "iwLqOY6Nr1BitBUex4K0Wep3JL8=",
+			"path": "github.com/pkg/errors",
+			"revision": "248dadf4e9068a0b3e79f02ed0a610d935de5302",
+			"revisionTime": "2016-10-29T09:36:37Z"
+		},
+		{
+			"checksumSHA1": "LzlSlifCUTtWAJHqQJPRSsjaeTQ=",
+			"path": "golang.org/x/crypto/curve25519",
 			"revision": ""
 		},
 		{
-			"checksumSHA1": "HggTVtTwNkLZiUKDgw9U8SBHNEc=",
+			"checksumSHA1": "qVGOnTSURPuj1/MQSfzH+kg9hPI=",
+			"path": "golang.org/x/crypto/ed25519",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "LXFcVx8I587SnWmKycSDEq9yvK8=",
+			"path": "golang.org/x/crypto/ed25519/internal/edwards25519",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "mNdrxIio4/5JSY5m1Wz/d0vqWO0=",
 			"path": "golang.org/x/crypto/ssh",
 			"revision": ""
 		}
