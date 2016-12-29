@@ -10,6 +10,7 @@ import (
 	"strings"
 	"github.com/astaxie/session"
 	_ "github.com/astaxie/session/providers/memory"
+	"encoding/json"
 )
 
 const(
@@ -31,6 +32,12 @@ func Service() {
 	http.HandleFunc("/delete", delete)
 	http.HandleFunc("/deploy",deploy)
 	http.HandleFunc("/loading",loading)
+
+	http.HandleFunc("/rest",restIndex)
+	http.HandleFunc("/rest/saveOrUpdate", restSaveOrUpdate)
+	//http.HandleFunc("/rest/delete", restdelete)
+	//http.HandleFunc("/rest/deploy",restdeploy)
+	//http.HandleFunc("/rest/loading",restloading)
 	err := http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal(err)
@@ -59,6 +66,28 @@ func index(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func restIndex(res http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+	name := globalSessions.SessionStart(res, req).Get("name")
+	jobs := job.Read()
+	set := false
+	for _,v := range jobs {
+		if name == v.Name{
+			v.Show = true
+			set = true
+		}
+	}
+	if !set && len(jobs) > 0 {
+		jobs[0].Show = true
+	}
+	bytes,err := json.Marshal(jobs)
+	if err != nil{
+		log.Println(err)
+	}
+	res.Header().Add("Access-Control-Allow-Origin","*")
+	io.WriteString(res,string(bytes))
+}
+
 func getTemplateFromFile() *template.Template  {
 	t,err := template.ParseFiles(temp)
 	if err != nil{
@@ -75,6 +104,18 @@ func getTemplateFromString() *template.Template {
 }
 
 func saveOrUpdate(res http.ResponseWriter, req *http.Request) {
+	j := toJob(req)
+	if j.Name == ""{
+		io.WriteString(res, "name must not null")
+	}
+	job.SaveOrUpdate(&j)
+	session := globalSessions.SessionStart(res, req)
+	session.Set("name",j.Name)
+	http.Redirect(res,req,"/" ,http.StatusMovedPermanently)
+	return
+}
+
+func restSaveOrUpdate(res http.ResponseWriter, req *http.Request) {
 	j := toJob(req)
 	if j.Name == ""{
 		io.WriteString(res, "name must not null")
