@@ -30,6 +30,8 @@ func Service() {
 	http.HandleFunc("/delete", delete)
 	http.HandleFunc("/deploy",deploy)
 	http.HandleFunc("/loading",loading)
+	rest := Rest{}
+	rest.init()
 	err := http.ListenAndServe(":80", nil)
 	if err != nil {
 		log.Fatal(err)

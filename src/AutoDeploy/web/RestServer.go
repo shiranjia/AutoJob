@@ -20,6 +20,10 @@ func (r *Rest) init()  {
 	//http.HandleFunc("/rest/loading",restloading)
 }
 
+type Jobs struct {
+	JS map[string][]*job.DeployJob
+}
+
 func restIndex(res http.ResponseWriter, req *http.Request) {
 	req.ParseForm()
 	name := globalSessions.SessionStart(res, req).Get("name")
@@ -34,11 +38,16 @@ func restIndex(res http.ResponseWriter, req *http.Request) {
 	if !set && len(jobs) > 0 {
 		jobs[0].Show = true
 	}
-	bytes,err := json.Marshal(jobs)
+
+	res.Header().Add("Access-Control-Allow-Origin","*")
+	j := Jobs{}
+	j.JS = make(map[string][]*job.DeployJob)
+	j.JS["jobs"] = jobs
+	bytes,err := json.Marshal(j)
 	if err != nil{
 		log.Println(err)
 	}
-	res.Header().Add("Access-Control-Allow-Origin","*")
+
 	io.WriteString(res,string(bytes))
 }
 
