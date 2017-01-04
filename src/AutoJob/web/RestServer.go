@@ -2,7 +2,7 @@ package web
 
 import (
 	"net/http"
-	"AutoDeploy/job"
+	"AutoJob/job"
 	"encoding/json"
 	"log"
 	"io"

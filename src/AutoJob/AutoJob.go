@@ -1,8 +1,8 @@
 package main
 
 import (
-	"AutoDeploy/job"
-	"AutoDeploy/web"
+	"AutoJob/job"
+	"AutoJob/web"
 	"os"
 	"log"
 	"path/filepath"

@@ -5,7 +5,7 @@ import (
 	"log"
 	"bufio"
 	"io"
-	"AutoDeploy/commons"
+	"AutoJob/commons"
 	"encoding/json"
 	"os/exec"
 	"bytes"
