@@ -104,7 +104,7 @@ func SaveOrUpdate(job *DeployJob) []*DeployJob {
 	return jobs
 }
 
-func Delete(j DeployJob) []*DeployJob {
+func Delete(j *DeployJob) []*DeployJob {
 	jobs := Read()
 	for i,v := range jobs {
 		if v.Name == j.Name{

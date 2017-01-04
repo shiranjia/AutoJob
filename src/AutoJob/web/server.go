@@ -89,7 +89,7 @@ func saveOrUpdate(res http.ResponseWriter, req *http.Request) {
 
 func delete(res http.ResponseWriter, req *http.Request) {
 	j := toJob(req)
-	job.Delete(j)
+	job.Delete(&j)
 	http.Redirect(res,req,"/",http.StatusMovedPermanently)
 }
 

@@ -17,7 +17,7 @@ type Rest struct {
 func (r *Rest) init()  {
 	http.HandleFunc("/rest",restIndex)
 	http.HandleFunc("/rest/saveOrUpdate", restSaveOrUpdate)
-	//http.HandleFunc("/rest/delete", restdelete)
+	http.HandleFunc("/rest/delete", restDelete)
 	//http.HandleFunc("/rest/deploy",restdeploy)
 	//http.HandleFunc("/rest/loading",restloading)
 }
@@ -68,7 +68,7 @@ func restSaveOrUpdate(res http.ResponseWriter, req *http.Request) {
 	}()
 	req.ParseForm()
 	jobJson := req.Form.Get("job")
-	//log.Println("jobJson:",jobJson)
+	log.Println("jobJson:",jobJson)
 	var _job *job.DeployJob = new(job.DeployJob)
 	err := json.Unmarshal([]byte(jobJson),_job)
 	if err != nil{
@@ -76,6 +76,27 @@ func restSaveOrUpdate(res http.ResponseWriter, req *http.Request) {
 	}
 	logJob(_job)
 	job.SaveOrUpdate(_job)
+	io.WriteString(res,"ok")
+}
+
+func restDelete(res http.ResponseWriter, req *http.Request)  {
+	res.Header().Add("Access-Control-Allow-Origin","*")
+	defer func(){
+		if err:=recover();err!=nil{
+			log.Println("restSaveOrUpdate.err:",err)
+			io.WriteString(res,"err")
+		}
+	}()
+	req.ParseForm()
+	jobJson := req.Form.Get("job")
+	log.Println("jobJson:",jobJson)
+	var _job *job.DeployJob = new(job.DeployJob)
+	err := json.Unmarshal([]byte(jobJson),_job)
+	if err != nil{
+		log.Println("err:",err)
+	}
+	logJob(_job)
+	job.Delete(_job)
 	io.WriteString(res,"ok")
 }
 
