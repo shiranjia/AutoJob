@@ -1,14 +1,14 @@
-#AutoDeploy
-an auto deploy tool  自动部署工具
+#AutoJob
+an auto job tool  自动部署工具
 
 任意添加本地命令
 任意添加远程命令
 任意上传文件或目录</br>
-######获取方式： go get github.com/shiranjia/AutoDeploy</br>
+######获取方式： go get github.com/shiranjia/AutoJob</br>
 ######将项目路径添加到GOPATH</br>
-######编译：AutoDeploy/src go install AutoDeploy</br>
-######../bin目录下生成 AutoDeploy 可执行文件，直接运行，浏览器访问127.0.0.1即可</br>
-[下载地址](https://github.com/shiranjia/AutoDeploy/releases  "releases")</br>
+######编译：AutoJob/src go install AutoJob</br>
+######../bin目录下生成 AutoJob 可执行文件，直接运行，浏览器访问127.0.0.1即可</br>
+[下载地址](https://github.com/shiranjia/AutoJob/releases  "releases")</br>
 例子： </br>
 ######ssh.userName: root ssh.password: ••••••••  ssh.ip:  192.168.104.141
 
