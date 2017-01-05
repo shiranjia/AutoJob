@@ -1,7 +1,7 @@
 #AutoJob
 an auto job tool  自动部署工具</br>
-新版本技术使用 vue2 + go rest api   访问地址：127.0.0.1</br>
-旧版本技术使用 jquery + go server   访问地址：127.0.0.1/old</br>
+新版本技术使用 [vue2](https://github.com/shiranjia/AutoJob-vue "AutoJob-vue") + go rest api   访问地址：http://127.0.0.1</br>
+旧版本技术使用 jquery + go server   访问地址：http://127.0.0.1/old</br>
 任意添加本地命令
 任意添加远程命令
 任意上传文件或目录</br>
