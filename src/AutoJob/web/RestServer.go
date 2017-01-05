@@ -18,7 +18,7 @@ func (r *Rest) init()  {
 	http.HandleFunc("/rest",restIndex)
 	http.HandleFunc("/rest/saveOrUpdate", restSaveOrUpdate)
 	http.HandleFunc("/rest/delete", restDelete)
-	//http.HandleFunc("/rest/deploy",restdeploy)
+	http.HandleFunc("/rest/deploy",restDeploy)
 	//http.HandleFunc("/rest/loading",restloading)
 }
 
@@ -97,6 +97,27 @@ func restDelete(res http.ResponseWriter, req *http.Request)  {
 	}
 	logJob(_job)
 	job.Delete(_job)
+	io.WriteString(res,"ok")
+}
+
+func restDeploy(res http.ResponseWriter, req *http.Request)  {
+	res.Header().Add("Access-Control-Allow-Origin","*")
+	defer func(){
+		if err:=recover();err!=nil{
+			log.Println("restSaveOrUpdate.err:",err)
+			io.WriteString(res,"err")
+		}
+	}()
+	req.ParseForm()
+	jobJson := req.Form.Get("job")
+	log.Println("jobJson:",jobJson)
+	var _job *job.DeployJob = new(job.DeployJob)
+	err := json.Unmarshal([]byte(jobJson),_job)
+	if err != nil{
+		log.Println("err:",err)
+	}
+	logJob(_job)
+	go _job.Deploy()
 	io.WriteString(res,"ok")
 }
 

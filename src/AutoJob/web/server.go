@@ -26,6 +26,7 @@ func init() {
 
 func Service() {
 	http.HandleFunc("/",index)
+	http.HandleFunc("/old",oldIndex)
 	http.HandleFunc("/saveOrUpdate", saveOrUpdate)
 	http.HandleFunc("/delete", delete)
 	http.HandleFunc("/deploy",deploy)
@@ -39,6 +40,16 @@ func Service() {
 }
 
 func index(res http.ResponseWriter, req *http.Request) {
+	t := template.New("deploy")
+	t.Parse(commons.Vue_html)
+	req.ParseForm()
+	err := t.Execute(res,nil)
+	if err != nil{
+		log.Fatal(err)
+	}
+}
+
+func oldIndex(res http.ResponseWriter, req *http.Request) {
 	//t := getTemplateFromFile()
 	t := getTemplateFromString()
 	req.ParseForm()
