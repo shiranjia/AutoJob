@@ -10,7 +10,7 @@ vue生成的js，css放在七牛存储</br>
 ######将项目路径添加到GOPATH</br>
 ######编译：AutoJob/src go install AutoJob</br>
 ######../bin目录下生成 AutoJob 可执行文件，直接运行，浏览器访问127.0.0.1即可</br>
-[下载地址](https://github.com/shiranjia/AutoJob/releases  "releases")</br>
+[下载地址](https://github.com/shiranjia/AutoJob/releases  "releases")</br></br>
 新版本：![image](https://github.com/shiranjia/AutoJob/blob/master/resources/20170105150404.png)</br>
 旧版本： </br>
 ######ssh.userName: root ssh.password: ••••••••  ssh.ip:  192.168.104.141
