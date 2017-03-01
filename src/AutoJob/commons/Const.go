@@ -174,7 +174,8 @@ const Html  = "<html>\n" +
 "</body>\n" +
 "</html>"
 
-const Vue_html  = `<!DOCTYPE html><html><head><meta charset=utf-8><title>AutoJob-vue</title><link href=http://ojanjwcaf.bkt.clouddn.com/app.fdc0edb0e6087f64580e7d3de2f3633e.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/manifest.8f37b3e7fe9edc33a473.js></script><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/vendor.a618f0590f623dec8293.js></script><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/app.bc17ae613af78ab72501.js></script></body></html>`
+const Vue_html  = `<!DOCTYPE html><html><head><meta charset=utf-8><title>AutoJob-vue</title><link href=http://ojanjwcaf.bkt.clouddn.com/app.417468c61b8b2f57a29175f189cbbcf8.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/app.862525bd45e2d46a1204.js></script><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/manifest.cf7d0255c193fa62a81b.js></script><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/vendor.1fbeb1313b48f9dab3a3.js></script></body></html>
+`
 
 type RemoteOutPut struct{
 	Name string
