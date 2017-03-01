@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"io"
 	"time"
-	"github.com/pkg/errors"
+	"io/ioutil"
 )
 
 /**
@@ -18,6 +18,7 @@ SSH配置
 type SSHConfig struct {
 	User     string
 	Password string
+	KeyPath  string
 	Ip       string
 	Port     int
 }
@@ -26,14 +27,32 @@ type SSHConfig struct {
 创建ssh客户端
 */
 func GetSSHClient(conf *SSHConfig) (*ssh.Client, error) {
-	if conf.Password == ""{
+	/*if conf.Password == ""{
 		return nil , errors.New("conf param null!")
-	}
-	config := &ssh.ClientConfig{
-		User: conf.User,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(conf.Password),
-		},
+	}*/
+	var config *ssh.ClientConfig
+	if "" == conf.Password{
+		key, err := ioutil.ReadFile(conf.KeyPath)
+		if err != nil {
+			log.Println("GetSSHClient.err",err)
+		}
+		signer, err := ssh.ParsePrivateKey([]byte(key))
+		if err != nil {
+			log.Println("GetSSHClient.err",err)
+		}
+		config = &ssh.ClientConfig{
+			User: conf.User,
+			Auth: []ssh.AuthMethod{
+				ssh.PublicKeys(signer),
+			},
+		}
+	}else {
+		config = &ssh.ClientConfig{
+			User: conf.User,
+			Auth: []ssh.AuthMethod{
+				ssh.Password(conf.Password),
+			},
+		}
 	}
 	if 0 == conf.Port{
 		conf.Port = 22

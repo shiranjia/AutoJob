@@ -10,6 +10,7 @@ import (
 	"strings"
 	"github.com/astaxie/session"
 	_ "github.com/astaxie/session/providers/memory"
+	_ "net/http/pprof"
 )
 
 const(
