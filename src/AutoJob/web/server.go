@@ -26,12 +26,13 @@ func init() {
 }
 
 func Service() {
-	http.HandleFunc("/",index)
+	http.HandleFunc("/index",index)
 	http.HandleFunc("/old",oldIndex)
 	http.HandleFunc("/saveOrUpdate", saveOrUpdate)
 	http.HandleFunc("/delete", delete)
 	http.HandleFunc("/deploy",deploy)
 	http.HandleFunc("/loading",loading)
+	http.Handle("/", http.FileServer(http.Dir(".")))
 	rest := Rest{}
 	rest.init()
 	err := http.ListenAndServe(":80", nil)

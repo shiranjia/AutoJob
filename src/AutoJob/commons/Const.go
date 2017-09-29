@@ -174,7 +174,7 @@ const Html  = "<html>\n" +
 "</body>\n" +
 "</html>"
 
-const Vue_html  = `<!DOCTYPE html><html><head><meta charset=utf-8><title>AutoJob-vue</title><link href=http://ojanjwcaf.bkt.clouddn.com/app.417468c61b8b2f57a29175f189cbbcf8.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/manifest.cf7d0255c193fa62a81b.js></script><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/vendor.1fbeb1313b48f9dab3a3.js></script><script type=text/javascript src=http://ojanjwcaf.bkt.clouddn.com/app.862525bd45e2d46a1204.js></script></body></html>`
+const Vue_html  = `<!DOCTYPE html><html><head><meta charset=utf-8><title>AutoJob-vue</title><link href=/static/css/app.5ac9f265a4bc95e9cbecb592cdb47109.css rel=stylesheet></head><body><div id=app></div><script type=text/javascript src=/static/js/manifest.e0d8dafc728916a8efa6.js></script><script type=text/javascript src=/static/js/vendor.77275bb3e2424013e0f0.js></script><script type=text/javascript src=/static/js/app.bd6ea18edc93fbf04349.js></script></body></html>`
 
 type RemoteOutPut struct{
 	Name string
