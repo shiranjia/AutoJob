@@ -8,9 +8,15 @@ vue生成的js，css放在七牛存储</br>
 任意添加远程命令
 任意上传文件或目录</br>
 
-##### 获取方式： go get github.com/shiranjia/AutoJob</br>
+##### 获取方式：
+```
+go get github.com/shiranjia/AutoJob
+```
 ##### 将项目路径添加到GOPATH</br>
-##### 编译：AutoJob/src go install AutoJob</br>
+##### 编译：</br>
+```
+go install AutoJob
+```
 ##### ../bin目录下生成 AutoJob 可执行文件，直接运行，浏览器访问127.0.0.1即可</br>
 [下载地址](https://github.com/shiranjia/AutoJob/releases  "releases")</br></br>
 新版本使用：![image](https://github.com/shiranjia/AutoJob/blob/master/resources/20170105150404.png)</br>
@@ -26,7 +32,9 @@ vue生成的js，css放在七牛存储</br>
 
 --------------------------------------------------------------------------------------------------------------------------------------
 ##### 远程命令(多条换行):
-###### rm -rf /path/*
+```
+rm -rf /path/*
+```
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -34,15 +42,20 @@ vue生成的js，css放在七牛存储</br>
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
-####### 本地命令 (多条换行 执行路径;命令;参数(参数用空格隔开)</br>
-####### example:E:\github\web;mav;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 ):
+###### 本地命令 (多条换行 执行路径;命令;参数(参数用空格隔开)</br>
+###### example:E:\github\web;mav;clean package -Dmaven.test.skip=true -P artifactory,development -Dfile.encoding=UTF-8 ):
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
 ###### 远程命令(多条换行):
-###### mv /home/web/* /path/
-###### sh /shellPath/restart
+```
+mv /home/web/* /path/
+sh /shellPath/restart
+```
 
 --------------------------------------------------------------------------------------------------------------------------------------
 
-#### 命令行单独执行任务：AutoJob.exe -j jobName -p dataPath
+#### 命令行单独执行任务：
+```
+AutoJob.exe -j jobName -p dataPath
+```
